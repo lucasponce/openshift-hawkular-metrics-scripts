@@ -1,5 +1,5 @@
 IMAGES_DIR=${HOME}/Downloads/images
-LOGGING_HOSTNAME="logging.dev.hawkular.io"
+LOGGING_HOSTNAME="logging.dev.hawkular.es"
 
 cd "${IMAGES_DIR}"
 echo "thepassword123" > /tmp/rootpw
