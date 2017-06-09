@@ -1,6 +1,6 @@
 ### on the VM
 LOGGING_HOSTNAME="logging.dev.hawkular.es"
-LOGGING_VM_IP="192.168.122.39"
+LOGGING_VM_IP="192.168.122.4"
 HOSTS_ENTRY="${LOGGING_VM_IP} ${LOGGING_HOSTNAME} openshift.${LOGGING_HOSTNAME} kibana.${LOGGING_HOSTNAME} mux.${LOGGING_HOSTNAME}"
 
 for port in 22 80 443 8443 24284
@@ -46,6 +46,7 @@ openshift_hosted_metrics_deploy=true
 openshift_metrics_install_metrics=true
 openshift_metrics_image_prefix=jpkroehling/origin-
 openshift_metrics_image_version=dev
+openshift_hosted_metrics_public_url=hawkular-metrics.app.${LOGGING_VM_IP}.nip.io
 openshift_metrics_hawkular_hostname=hawkular-metrics.app.${LOGGING_VM_IP}.nip.io
 openshift_metrics_cassandra_replicas=1
 
@@ -77,14 +78,4 @@ do
 	echo $new_json | oc create -n logging -f -
 done
 
-## add the hawkular user to the fluentd role
-espod=$(oc get pods -n logging -l component=es  -o name | awk -F\/ '{print $2}')
-oc exec -n logging $espod -- curl -s -k \
-    --cert /etc/elasticsearch/secret/admin-cert --key /etc/elasticsearch/secret/admin-key \
-    https://localhost:9200/.searchguard.$espod/rolesmapping/0 | \
-  python -c 'import json, sys; hsh = json.loads(sys.stdin.read())["_source"]; hsh["sg_role_fluentd"]["users"].append("'hawkular'"); print json.dumps(hsh)' | \
-  oc exec -n logging -i $espod -- curl -s -k --cert /etc/elasticsearch/secret/admin-cert --key /etc/elasticsearch/secret/admin-key \
-    https://localhost:9200/.searchguard.$espod/rolesmapping/0 -XPUT -d@- |     python -mjson.tool
-
-## sudo make me a sandwich
-oc adm policy add-cluster-role-to-user cluster-admin developer
+echo "Execute 04-config-hawkular-user.sh when logging pods are up and running, this might need time depending on your installation"
