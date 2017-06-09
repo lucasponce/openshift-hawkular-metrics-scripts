@@ -58,6 +58,26 @@ EOF
 
 ANSIBLE_LOG_PATH=/tmp/ansible.log ansible-playbook -vvv -e @/opt/ansible/vars.yaml -i /opt/ansible/ansible-inventory /opt/ansible/playbooks/byo/config.yml
 
+## remove the readiness probe from es and kibana
+for component in es kibana
+do
+	dc=$(oc get dc -n logging -l component=${component} -o name -n logging 2> /dev/null)
+    if [ $? != 0 ]; then
+		echo "Could not get the DC for component ${component}"
+		continue
+	fi
+
+	new_json=$(oc get ${dc} -o json -n logging 2> /dev/null | python -c 'import json, sys; hsh = json.loads(sys.stdin.read()); del hsh["spec"]["template"]["spec"]["containers"][0]["readinessProbe"]; print json.dumps(hsh)' 2> /dev/null)
+	if [ $? != 0 ]; then
+		echo "Could not remove the readiness probe from the component ${component}"
+		continue
+	fi
+
+	oc delete -n logging ${dc}
+	echo $new_json | oc create -n logging -f -
+done
+
+## add the hawkular user to the fluentd role
 espod=$(oc get pods -n logging -l component=es  -o name | awk -F\/ '{print $2}')
 oc exec -n logging $espod -- curl -s -k \
     --cert /etc/elasticsearch/secret/admin-cert --key /etc/elasticsearch/secret/admin-key \
