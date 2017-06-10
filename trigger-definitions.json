@@ -13,8 +13,8 @@
         "context": {
           "timestamp": "@timestamp",
           "interval": "30s",
-          "index": "project.logging*",
-          "mapping": "level:category,@timestamp:ctime,message:text,kubernetes.labels.component:dataId,index:tags"
+          "index": ".operations.*",
+          "mapping": "'operations':category,@timestamp:ctime,message:text,hostname:dataId,index:tags"
         },
         "actions":[
           {
@@ -30,8 +30,8 @@
       "conditions":[
         {
           "type": "EVENT",
-          "dataId": "AppA",
-          "expression": "category == '6',text contains 'cluster'"
+          "dataId": "logging.dev.hawkular.es",
+          "expression": "text contains 'kubernetes'"
         }
       ]
     }
