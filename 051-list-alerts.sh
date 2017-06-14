@@ -8,4 +8,4 @@ curl -k -v \
     -H "Hawkular-Tenant: ${HAWKULAR_TENANT}" \
     -H "Authorization: Bearer ${HAWKULAR_TOKEN}" \
     -H "Content-Type: application/json" \
-    https://${HAWKULAR_HOST}/hawkular/alerts/triggers
+    https://${HAWKULAR_HOST}/hawkular/alerts?triggerIds=trigger-logging-post

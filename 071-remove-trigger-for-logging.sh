@@ -8,5 +8,5 @@ curl -k -v \
        -H "Hawkular-Tenant: ${HAWKULAR_TENANT}" \
        -H "Authorization: Bearer ${HAWKULAR_TOKEN}" \
        -H "Content-Type: application/json" \
-       -d @trigger-definitions.json \
-       https://${HAWKULAR_HOST}/hawkular/alerts/import/all | jq
+       -X DELETE \
+       https://${HAWKULAR_HOST}/hawkular/alerts/triggers/trigger-logging-post 

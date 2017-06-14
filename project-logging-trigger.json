@@ -1,0 +1,46 @@
+{
+  "triggers":[
+    {
+      "trigger":{
+        "id": "trigger-logging-post",
+        "name": "Alert on POST log",
+        "description": "Alert on POST log",
+        "severity": "HIGH",
+        "enabled": true,
+        "tags": {
+          "Elasticsearch": "Localhost instance"
+        },
+        "context": {
+          "timestamp": "@timestamp",
+          "interval": "30s",
+          "index": "project.logging.*",
+          "mapping": "kubernetes.labels.component:category,@timestamp:ctime,message:text,hostname:dataId,index:tags"
+        },
+        "actions":[
+          {
+            "actionPlugin": "elasticsearch",
+            "actionId": "write-partial-alert"
+          }
+        ]
+      },
+      "conditions":[
+        {
+          "type": "EVENT",
+          "dataId": "logging.dev.hawkular.es",
+          "expression": "text contains 'POST'"
+        }
+      ]
+    }
+    ],
+  "actions":[
+    {
+      "actionPlugin": "elasticsearch",
+      "actionId": "write-partial-alert",
+      "properties": {
+        "index": "alerts_summary",
+        "timestamp_pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ",
+        "transform": "{\"tenantId\":\"tenant\",\"ctime\":\"timestamp\",\"text\":\"trigger\",\"context\":{\"interval\":\"fetch-interval\"},\"evalSets\":{\"*\":{\"*\":{\"condition\":{\"expression\":\"details.[&3][&2].expression\",\"dataId\":\"details.[&3][&2].dataId\"},\"value\":\"details.[&2][&1].value\"}}}}"
+      }
+    }
+  ]
+}
