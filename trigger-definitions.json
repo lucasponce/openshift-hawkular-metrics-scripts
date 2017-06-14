@@ -14,13 +14,9 @@
           "timestamp": "@timestamp",
           "interval": "30s",
           "index": ".operations.*",
-          "mapping": "'operations':category,@timestamp:ctime,message:text,hostname:dataId,index:tags"
+          "mapping": "kubernetes.namespace_name:category,@timestamp:ctime,message:text,hostname:dataId,index:tags"
         },
         "actions":[
-          {
-            "actionPlugin": "elasticsearch",
-            "actionId": "write-full-alert"
-          },
           {
             "actionPlugin": "elasticsearch",
             "actionId": "write-partial-alert"
@@ -31,19 +27,12 @@
         {
           "type": "EVENT",
           "dataId": "logging.dev.hawkular.es",
-          "expression": "text contains 'kubernetes'"
+          "expression": "category == 'openshift-infra',text contains 'HAWKALERT'"
         }
       ]
     }
     ],
   "actions":[
-    {
-      "actionPlugin": "elasticsearch",
-      "actionId": "write-full-alert",
-      "properties": {
-        "index": "alerts_full"
-      }
-    },
     {
       "actionPlugin": "elasticsearch",
       "actionId": "write-partial-alert",
