@@ -2,19 +2,19 @@
   "triggers":[
     {
       "trigger":{
-        "id": "Logs-from-Logging",
-        "name": "Logs from Logging",
-        "description": "Alert on any log from logging project",
+        "id": "trigger1",
+        "name": "OpenShift Infra",
+        "description": "Alert on WARN logs from Cassandra",
         "severity": "HIGH",
         "enabled": true,
         "tags": {
-          "Elasticsearch": "Localhost instance"
+          "Elasticsearch": "OS instance"
         },
         "context": {
           "timestamp": "@timestamp",
           "interval": "30s",
           "index": ".operations.*",
-          "mapping": "kubernetes.namespace_name:category,@timestamp:ctime,message:text,hostname:dataId,index:tags"
+          "mapping": "kubernetes.container_name:category,@timestamp:ctime,message:text,hostname:dataId,index:tags"
         },
         "actions":[
           {
@@ -27,10 +27,42 @@
         {
           "type": "EVENT",
           "dataId": "logging.dev.hawkular.es",
-          "expression": "category == 'openshift-infra',text contains 'HAWKALERT'"
+          "expression": "category starts 'hawkular-cassandra',text contains 'WARN'"
+        }
+      ]
+    },
+    {
+      "trigger":{
+        "id": "trigger2",
+        "name": "Alert on kibana POST",
+        "description": "Alert on any POST log from Kibana",
+        "severity": "HIGH",
+        "enabled": true,
+        "tags": {
+          "Elasticsearch": "OS instance"
+        },
+        "context": {
+          "timestamp": "@timestamp",
+          "interval": "30s",
+          "index": "project.logging.*",
+          "mapping": "kubernetes.labels.component:category,@timestamp:ctime,message:text,hostname:dataId,index:tags"
+        },
+        "actions":[
+          {
+            "actionPlugin": "elasticsearch",
+            "actionId": "write-partial-alert"
+          }
+        ]
+      },
+      "conditions":[
+        {
+          "type": "EVENT",
+          "dataId": "logging.dev.hawkular.es",
+          "expression": "category == 'kibana',text contains 'POST'"
         }
       ]
     }
+   
     ],
   "actions":[
     {
