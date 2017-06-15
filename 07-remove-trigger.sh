@@ -18,3 +18,9 @@ curl -k -v \
        -X DELETE \
        https://${HAWKULAR_HOST}/hawkular/alerts/triggers/trigger2
         
+curl -k -v \
+       -H "Hawkular-Tenant: ${HAWKULAR_TENANT}" \
+       -H "Authorization: Bearer ${HAWKULAR_TOKEN}" \
+       -H "Content-Type: application/json" \
+       -X DELETE \
+       https://${HAWKULAR_HOST}/hawkular/alerts/triggers/trigger3
