@@ -1,0 +1,47 @@
+{
+  "triggers":[
+    {
+      "trigger":{
+        "id": "trigger1",
+        "name": "Logstash alerting",
+        "description": "Alert on XFS messages",
+        "severity": "HIGH",
+        "enabled": true,
+        "tags": {
+          "Elasticsearch": "OS instance"
+        },
+        "context": {
+          "timestamp": "@timestamp",
+          "interval": "30s",
+          "url": "http://hostmountedes-elasticsearch.ose.sbu.lab.eng.bos.redhat.com/",
+          "index": "logstash.*",
+          "mapping": "level:category,@timestamp:ctime,message:text,hostname:dataId,index:tags,es_type:tags"
+        },
+        "actions":[
+          {
+            "actionPlugin": "elasticsearch",
+            "actionId": "write-partial-alert"
+          }
+        ]
+      }     
+      "conditions":[
+        {
+          "type": "EVENT",
+          "dataId": "gprfc059.sbu.lab.eng.bos.redhat.com",
+          "expression": "category == 'notice',text contains 'XFS'"
+        }
+      ]
+    }   
+    ],
+  "actions":[
+    {
+      "actionPlugin": "elasticsearch",
+      "actionId": "write-partial-alert",
+      "properties": {
+        "index": "alerts_summary",
+        "timestamp_pattern": "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ",
+        "transform": "{\"tenantId\":\"tenant\",\"ctime\":\"timestamp\",\"text\":\"trigger\",\"context\":{\"interval\":\"fetch-interval\"},\"evalSets\":{\"*\":{\"*\":{\"condition\":{\"expression\":\"details.[&3][&2].expression\",\"dataId\":\"details.[&3][&2].dataId\"},\"value\":\"details.[&2][&1].value\"}}}}"
+      }
+    }
+  ]
+}
